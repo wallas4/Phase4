@@ -49,7 +49,7 @@ and Locations.  This will allow us to create an Event and simply "select"
 Locations from a common pool, rather than specifying a potentially duplicate
 list of Locations for each Event.  This association will take the form of a
 "join table" that we will create with a database migration that simply maps
-each Location in an Event to every Participant of that Event:
+each Event to a Location of that Event:
 
 ```
 event 1 | location 1
@@ -74,12 +74,12 @@ form of `model1plural_model2plural`, in alphabetical order:
 `rails g migration CreateEventsParticipants`
 
 The above command will generate a migration that creates a table called
-`events_participants`.
+`events_locations`.
 
 We need to go in and edit the table to specify the columns: simply add
 the belongs_to method for each model, as well as an index.
 
-`t.belongs_to :participants, index: true` `t.belongs_to :locations,
+`t.belongs_to :locations, index: true` `t.belongs_to :events,
 index: true`
 
 Finally, make sure we "turn off" the primary key id column before
