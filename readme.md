@@ -86,7 +86,7 @@ Finally, make sure we "turn off" the primary key id column before
 passing the block into the create_table command, by modifying the line
 like so:
 
-`def create_table :locations_participants, id: false do |t|`
+`def create_table :events_locations, id: false do |t|`
 
 Now, we should be able to run the migration as per normal: `rake
 db:migrate`
