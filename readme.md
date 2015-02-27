@@ -36,7 +36,7 @@ A Location will consist of the following attributes:
 It will also have a `has_and_belongs_to_many` association with the Event
 resource.  We can generate this resource with a scaffolding command:
 
-`rails g scaffold Location name:string tag:string event:references`
+`rails g scaffold Location name:string tag:string`
 
 Remember to migrate the database to account for these resources: `rake
 db:migrate`
@@ -57,15 +57,15 @@ event 1 | location 3
 event 2 | location 1
 event 2 | location 2
 event 3 | location 2
-event 3 | location 3`
+event 3 | location 3
 ```
 
 We call this type of association in Rails a `has_and_belongs_to_many`
 association.  It is a bit more involved to set it up: First, we must
 edit the Event model and the Location model to specify the association:
 
-in Event: `has_and_belongs_to_many :locations` in Location:
-`has_and_belongs_to_many :events`
++ in Event: `has_and_belongs_to_many :locations` 
++ in Location: `has_and_belongs_to_many :events`
 
 Next, we must create a database migration that will create a the join
 table for us.  The Rails convention is that join tables are named in the
@@ -73,14 +73,17 @@ form of `model1plural_model2plural`, in alphabetical order:
 
 `rails g migration CreateEventsLocations`
 
-The above command will generate a migration that creates a table called
+The above command will generate a migration file, located in
+db/migrate/, that creates a table called
 `events_locations`.
 
-We need to go in and edit the table to specify the columns: simply add
+We need to go into the migration file and edit the table to specify the columns: simply add
 the belongs_to method for each model, as well as an index.
 
-`t.belongs_to :locations, index: true` `t.belongs_to :events,
-index: true`
+```
+t.belongs_to :locations, index: true
+t.belongs_to :events, index: true`
+```
 
 Finally, make sure we "turn off" the primary key id column before
 passing the block into the create_table command, by modifying the line
@@ -99,7 +102,7 @@ Locations.  We will worry about associating Events and Locations later:
 
 ```
 2.times do |i|
-  Event.create(name: "Event #{i + 1}"
+  Event.create(name: "Event #{i + 1}")
 end
 
 5.times do |i|
