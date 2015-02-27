@@ -94,24 +94,19 @@ db:migrate`
 ## Seeding the database
 
 We can initialize the database with some test data to get started.  We
-will edit the `config/seeds.rb` file to generate 2 events and 3
-locations for each event:
+will edit the `config/seeds.rb` file to generate 2 Events and 5
+Locations.  We will worry about associating Events and Locations later:
 
 ```
 2.times do |i|
   Event.create(name: "Event #{i + 1}"
-  3.times do |j|
-    if Location.any?
-      id = Location.last.id
-    else
-      id = 0
-    end
+end
+
+5.times do |i|
     Location.create(
-      name: "Location #{id + 1} belongs to Event #{i + 1}",
-      tag: (('A'..'Z').to_a + ('a'..'z').to_a + (0..9).to_a).shuffle[0..7].join,
-      event_id: i + 1
+        name: "Location #{i + 1}",
+        tag: (('A'..'Z').to_a + ('a'..'z').to_a + (0..9).to_a).shuffle[0..7].join,
     )
-  end
 end
 ```
 After creating our seed file, we can initialize the database with:
@@ -121,17 +116,3 @@ After creating our seed file, we can initialize the database with:
 and at anytime we "mess up" our data, we can reset it with:
 
 `rake db:reset`
-
-## Modifying the views
-
-We want the following behaviour when we run our app:
-
-- When we list an event, we want a list of locations displayed as well
-- When we edit an event, we want to add, delete, or edit locations as
-  well
-- When we create a new location, we want to automatically assign it to
-  the event from which we created the location
-
-In order to do this, we will need to modify the `_form.html.erb` and
-`edit.html.erb` views for the Event resource, as well as the
-`_form.html.erb` view for the Location resource.
