@@ -71,7 +71,7 @@ Next, we must create a database migration that will create a the join
 table for us.  The Rails convention is that join tables are named in the
 form of `model1plural_model2plural`, in alphabetical order:
 
-`rails g migration CreateEventsParticipants`
+`rails g migration CreateEventsLocations`
 
 The above command will generate a migration that creates a table called
 `events_locations`.
