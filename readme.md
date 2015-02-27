@@ -41,21 +41,24 @@ resource.  We can generate this resource with a scaffolding command:
 Remember to migrate the database to account for these resources: `rake
 db:migrate`
 
-## Creating the associations The association between Events and
-Locations is a bit tricky. It seems reasonable that we should have a
-many-many type of association between Events and Locations.  This will
-allow us to create an Event and simply "select" Locations from a common
-pool, rather than specifying a potentially duplicate list of Locations
-for each Event.  This association will take the form of a "join table"
-that we will create with a database migration that simply maps each
-Location in an Event to every Participant of that Event:
+## Creating the associations 
 
-`event 1 | location 1
+The association between Events and Locations is a bit tricky. It seems
+reasonable that we should have a many-many type of association between Events
+and Locations.  This will allow us to create an Event and simply "select"
+Locations from a common pool, rather than specifying a potentially duplicate
+list of Locations for each Event.  This association will take the form of a
+"join table" that we will create with a database migration that simply maps
+each Location in an Event to every Participant of that Event:
+
+```
+event 1 | location 1
 event 1 | location 3
 event 2 | location 1
 event 2 | location 2
 event 3 | location 2
 event 3 | location 3`
+```
 
 We call this type of association in Rails a `has_and_belongs_to_many`
 association.  It is a bit more involved to set it up: First, we must
