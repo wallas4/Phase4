@@ -97,7 +97,7 @@ db:migrate`
 ## Seeding the database
 
 We can initialize the database with some test data to get started.  We
-will edit the `config/seeds.rb` file to generate 2 Events and 5
+will edit the `db/seeds.rb` file to generate 2 Events and 5
 Locations.  We will worry about associating Events and Locations later:
 
 ```
