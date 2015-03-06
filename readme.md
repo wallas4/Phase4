@@ -81,8 +81,8 @@ We need to go into the migration file and edit the table to specify the columns:
 the belongs_to method for each model, as well as an index.
 
 ```
-t.belongs_to :locations, index: true
-t.belongs_to :events, index: true`
+t.belongs_to :location, index: true
+t.belongs_to :event, index: true`
 ```
 
 Finally, make sure we "turn off" the primary key id column before
