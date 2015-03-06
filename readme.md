@@ -1,121 +1,84 @@
-# CS 270 - Spring 2015 - QR Code Scavenger Hunt - Phase 1
+# CS 270 - Spring 2015 - QR Code Scavenger Hunt - Phase 2
 
-In this phase, we will create the Event and Location resources.  In
-doing so, we will need to figure out how to wire together these two
-resources in a logical manner to reflect the dependencies we have
-specified for the project.
+In this phase, we will tie the Event and Location resources together in
+order to take advantage of the association we established previously.
+Recall, many Locations could belong to many Events.  It seems reasonable
+that in the "edit" page of an Event, to have a listing of available
+Locations from which to choose from for that particular event.  Thus, in
+this phase we will be dealing with a bit of controller and view
+manipulation.
 
-A new Rails app has already been created.  To get started, simply clone
-the respository into your system.
+To complete this phase, you need to do the following:
 
-As a side note, the `rqrcode` gem has already been included into the
-Gemfile.  To complete this phase, then, you should simply need to do the
-following:
+## Event controller
 
-## Event resource
+We want to accomplish two main tasks for the Event controller:
 
-An Event will consist of the following attributes:
+First, we want to display a listing of "Available locations", and we
+want this listing to appear only on the "edit" page for each individual
+Event.
 
-- name (as a string)
+Second, for a particular Event, we want to display a listing of "Event
+locations".  We want this listing to appear on both the "show" page and
+the "edit" page for a particular Event.
 
-It will also have a `has_and_belongs_to_many` association with the
-Location resource.  In order to accomplish this, we will generate the
-Event and Locations resources first, and then we will create the
-association.  We can generate the Event resource with a scaffolding
-command:
+We also want to avoid duplicating Locations in the above lists.  For
+example, if a Location 2 is part of Event 1, then Location 2 should not
+appear in the "Available locations" listing.  Likewise, if a Location is
+not part of an Event, then that Location should not appear in the "Event
+locations" listing.
 
-`rails g scaffold Event name:string`
+## Edit event page
 
-## Location resource
+In the edit event page, we want display "Available locations" for those
+Locations not already associated with the Event.  We can access
+Locations that are associated with an Event because we have already
+established the `has_and_belongs_to_many` relationship between the two
+models.  Rails provides some extra methods for the association.  In
+particular, we now can reference the associated objects of a different
+model with `Model.associated_objects`, which returns to us a Ruby Array.
 
-A Location will consist of the following attributes:
-
-- name (as a string)
-- tag (as a randomly generated string of 8 alphanumeric characters)
-
-It will also have a `has_and_belongs_to_many` association with the Event
-resource.  We can generate this resource with a scaffolding command:
-
-`rails g scaffold Location name:string tag:string`
-
-Remember to migrate the database to account for these resources: `rake
-db:migrate`
-
-## Creating the associations 
-
-The association between Events and Locations is a bit tricky. It seems
-reasonable that we should have a many-many type of association between Events
-and Locations.  This will allow us to create an Event and simply "select"
-Locations from a common pool, rather than specifying a potentially duplicate
-list of Locations for each Event.  This association will take the form of a
-"join table" that we will create with a database migration that simply maps
-each Event to a Location of that Event:
+Thus, because Rails takes care of handling the association for us
+internally as an Array, we can modify the `_form.html.erb` file in the
+Event view as follows:
 
 ```
-event 1 | location 1
-event 1 | location 3
-event 2 | location 1
-event 2 | location 2
-event 3 | location 2
-event 3 | location 3
+<p>
+  Available locations:
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Tag</th>
+        <th colspan="3"></th>
+      </tr>
+    </thead>
+
+  <% Location.all.each do |location| %>
+    <% if ! @event.locations.include? location %>
+      <tr>
+        <td><%= location.name %></td>
+        <td><%= location.tag %></td>
+        <td><%= link_to 'Show', location %></td>
+        <td><%= link_to 'Edit', edit_location_path(location) %></td>
+        <td><%= link_to 'Destroy', location, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  <% end %>
+  </table>
+</p>
 ```
 
-We call this type of association in Rails a `has_and_belongs_to_many`
-association.  It is a bit more involved to set it up: First, we must
-edit the Event model and the Location model to specify the association:
+## Add locations to events
 
-+ in Event: `has_and_belongs_to_many :locations` 
-+ in Location: `has_and_belongs_to_many :events`
+Next, we need to actually add a Location to a particular Event.  We can
+do so by creating a list of checkboxes that will contain the Locations
+to add to the Event when we click the "Update Event" button on the edit
+page:
 
-Next, we must create a database migration that will create a the join
-table for us.  The Rails convention is that join tables are named in the
-form of `model1plural_model2plural`, in alphabetical order:
+`<td><%= check_box_tag 'add_locations[]', location.id %></td>`
 
-`rails g migration CreateEventsLocations`
-
-The above command will generate a migration file, located in
-db/migrate/, that creates a table called
-`events_locations`.
-
-We need to go into the migration file and edit the table to specify the columns: simply add
-the belongs_to method for each model, as well as an index.
-
-```
-t.belongs_to :location, index: true
-t.belongs_to :event, index: true`
-```
-
-Finally, make sure we "turn off" the primary key id column before
-passing the block into the create_table command, by modifying the line
-like so:
-
-`def create_table :events_locations, id: false do |t|`
-
-Now, we should be able to run the migration as per normal: `rake
-db:migrate`
-
-## Seeding the database
-
-We can initialize the database with some test data to get started.  We
-will edit the `db/seeds.rb` file to generate 2 Events and 5
-Locations.  We will worry about associating Events and Locations later:
-
-```
-2.times do |i|
-  Event.create(name: "Event #{i + 1}")
-end
-
-5.times do |i|
-    Location.create(
-        name: "Location #{i + 1}",
-        tag: (('A'..'Z').to_a + ('a'..'z').to_a + (0..9).to_a).shuffle[0..7].join,
-    )
-end
-```
-After creating our seed file, we can initialize the database with:
-
-`rake db:seed`
-
-and at anytime we "mess up" our data, we can reset it with:
-
-`rake db:reset`
+This will not only create a checkbox for each location, but when we
+click "Update Event", the id of each selected Location will be passed as
+an Array in the update parameters.
