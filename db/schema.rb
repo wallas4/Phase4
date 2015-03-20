@@ -20,12 +20,12 @@ ActiveRecord::Schema.define(version: 20150306160536) do
   end
 
   create_table "events_locations", id: false, force: true do |t|
-    t.integer "locations_id"
-    t.integer "events_id"
+    t.integer "location_id"
+    t.integer "event_id"
   end
 
-  add_index "events_locations", ["events_id"], name: "index_events_locations_on_events_id"
-  add_index "events_locations", ["locations_id"], name: "index_events_locations_on_locations_id"
+  add_index "events_locations", ["event_id"], name: "index_events_locations_on_event_id"
+  add_index "events_locations", ["location_id"], name: "index_events_locations_on_location_id"
 
   create_table "locations", force: true do |t|
     t.string   "name"
